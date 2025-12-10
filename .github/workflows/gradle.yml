@@ -26,12 +26,25 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew build
 
+    - name: Prepare JAR artifacts
+      run: |
+        set -eo pipefail
+        out_dir="build/upload"
+        rm -rf "$out_dir"
+        mkdir -p "$out_dir"
+        yymmdd=$(date +%y%m%d)
+        find build/libs -type f -name '*.jar' -print0 | while IFS= read -r -d '' jar; do
+          base=$(basename "$jar")
+          newbase="${base%.jar}-${yymmdd}.jar"
+          cp "$jar" "$out_dir/$newbase"
+        done
+
     - name: Upload JAR artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: build-jars
-        path: |
-          build/libs/**/*.jar
+        path: build/upload/*.jar
+        if-no-files-found: error
 
   dependency-submission:
     runs-on: ubuntu-latest
