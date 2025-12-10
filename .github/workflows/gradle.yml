@@ -3,7 +3,9 @@ name: Build
 on:
   push:
     branches: [ "master" ]
-    paths: ["gradle.properties"]
+    paths:
+      - "gradle.properties"
+      - "src/**/*.java"
   workflow_dispatch:
 
 jobs:
@@ -42,7 +44,7 @@ jobs:
     - name: Upload JAR artifacts
       uses: actions/upload-artifact@v5
       with:
-        name: build-jars
+        name: jars
         path: build/upload/*.jar
         if-no-files-found: error
 
